@@ -8,7 +8,7 @@ public class ShadowCaster : MonoBehaviour
 {
     public GameObject lightSource; // Source de lumière
     private List<Vector3> intersectionPoints = new List<Vector3>();
-    private int gridResolution = 1000; // Résolution de la grille
+    private int gridResolution = 10; // Résolution de la grille
 
 
 
@@ -24,8 +24,8 @@ public class ShadowCaster : MonoBehaviour
     {
 
         List<Vector3> intersectionPointsTmp = RayCast();
-        //if (isShapeOk(intersectionPointsTmp))
-        //    RoatateObject.Won = true;
+        if (isShapeOk(intersectionPointsTmp))
+            RoatateObject.Won = true;
 
 
 
@@ -54,16 +54,32 @@ public class ShadowCaster : MonoBehaviour
                     {
                         for (int z = 0; z < gridResolution; z++)
                         {
+                            float minX = boundsMin.x < boundsMax.x ? boundsMin.x : boundsMax.x;
+                            float maxX = boundsMin.x > boundsMax.x ? boundsMin.x : boundsMax.x;
+
+                            float minY = boundsMin.y < boundsMax.y ? boundsMin.y : boundsMax.y;
+                            float maxY = boundsMin.y > boundsMax.y ? boundsMin.y : boundsMax.y;
+
+                            float minZ = boundsMin.z < boundsMax.z ? boundsMin.z : boundsMax.z;
+                            float maxZ = boundsMin.z > boundsMax.z ? boundsMin.z : boundsMax.z;
+
                             // Calculer la position du point sur la grille
                             Vector3 pointOnGrid = new Vector3(
-                                Mathf.Lerp(boundsMin.x, boundsMax.x, (float)x / gridResolution),
-                                Mathf.Lerp(boundsMin.y, boundsMax.y, (float)y / gridResolution),
-                                Mathf.Lerp(boundsMin.z, boundsMax.z, (float)z / gridResolution)
+                                Mathf.Lerp(minX, maxX, (float)x / gridResolution),
+                                Mathf.Lerp(minY, maxY, (float)y / gridResolution),
+                                Mathf.Lerp(minZ, maxZ, (float)z / gridResolution)
                             );
 
 
+                        //    Vector3 pointOnGrid = new Vector3(
+                        //        Mathf.Lerp(minX - minX, maxX + maxX, (float)x / gridResolution),
+                        //        Mathf.Lerp(minY - minY, maxY + maxY, (float)y / gridResolution),
+                        //        Mathf.Lerp(minZ - minZ, maxZ + maxZ, (float)z / gridResolution)
+                        //    );
+
                             // Lancer un rayon depuis la source de lumière vers le point sur la grille
                             Vector3 lightDirection = pointOnGrid - lightSource.transform.position;
+
 
                             RaycastHit hit;
 
@@ -80,8 +96,8 @@ public class ShadowCaster : MonoBehaviour
 
                                 }
                             }
-                            else
-                                Debug.DrawLine(lightSource.transform.position, hit.point, Color.blue);
+
+
                         }
                     }
                 }
@@ -119,7 +135,8 @@ public class ShadowCaster : MonoBehaviour
         for (int i = 0; i < shape1.Count - 1; i++)
         {
             diff += Mathf.Abs(Vector3.Distance(shape1[i + 1], shape1[i]) - Vector3.Distance(shape2[i + 1], shape2[i]));
-            if (diff > 2)
+            Debug.Log(diff);
+            if (diff > 5)
                 return false;
         }
         return true;
